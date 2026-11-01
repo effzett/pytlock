@@ -1,0 +1,7 @@
+pytlock für macOS (Apple Silicon)
+
+Die App ist nicht signiert/notarisiert. Beim ersten Start blockiert Gatekeeper.
+Freigabe: pytlock.app.zip entpacken, App nach /Programme ziehen, dann
+  Rechtsklick auf pytlock.app → Öffnen → Öffnen
+oder im Terminal:
+  xattr -dr com.apple.quarantine /Applications/pytlock.app

@@ -1,0 +1,12 @@
+pytlock bündelt folgende Software Dritter:
+
+tle (drand/tlock) – https://github.com/drand/tlock
+  Lizenz: MIT OR Apache-2.0 (Texte im Repository: LICENSE-MIT, LICENSE-APACHE)
+
+Qt for Python (PySide6) – https://www.qt.io/qt-for-python
+  Lizenz: LGPL-3.0 (dynamisch gelinkt; die Qt-Bibliotheken liegen als eigene Dateien im Paket
+  und können ersetzt werden)
+
+cryptography – Apache-2.0 OR BSD-3-Clause
+asn1crypto – MIT
+certifi – MPL-2.0

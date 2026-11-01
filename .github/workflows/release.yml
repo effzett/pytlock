@@ -1,0 +1,96 @@
+name: Release
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+env:
+  TLE_VERSION: v1.2.0
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15          # Apple Silicon (arm64)
+            asset: pytlock-macos-arm64.zip
+          - os: windows-latest    # x64
+            asset: pytlock-windows-x64.zip
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "stable"
+          cache: false
+
+      # tle aus den Quellen des gepinnten Tags bauen; go.sum/sum.golang.org
+      # sichern die Integrität der Module ab.
+      - name: tle bauen
+        run: |
+          mkdir -p vendor/tle
+          GOBIN="$PWD/vendor/tle" CGO_ENABLED=0 go install -trimpath -ldflags "-s -w" \
+            github.com/drand/tlock/cmd/tle@${TLE_VERSION}
+          ls -l vendor/tle
+          echo "PYTLOCK_TLE=$PWD/vendor/tle/$( [ "$RUNNER_OS" = Windows ] && echo tle.exe || echo tle )" >> "$GITHUB_ENV"
+
+      - name: Abhängigkeiten
+        run: pip install -e ".[dev]"
+
+      - name: Unit-Tests
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: pytest -v
+
+      - name: Live-Tests (drand, TSA, tle-Interoperabilität)
+        run: pytest -v -m live
+
+      - name: PyInstaller
+        run: pyinstaller packaging/pytlock.spec --noconfirm
+
+      - name: Paketieren (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          cp packaging/LIESMICH-macOS.txt dist/
+          cd dist && ditto -c -k --keepParent pytlock.app pytlock.app.zip
+          zip -j ../${{ matrix.asset }} pytlock.app.zip LIESMICH-macOS.txt
+
+      - name: Paketieren (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Copy-Item packaging/LIESMICH-Windows.txt dist/pytlock/
+          Compress-Archive -Path dist/pytlock -DestinationPath ${{ matrix.asset }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset }}
+          path: ${{ matrix.asset }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Prüfsummen
+        run: cd dist && sha256sum *.zip > SHA256SUMS.txt && cat SHA256SUMS.txt
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.zip
+            dist/SHA256SUMS.txt
+          generate_release_notes: true

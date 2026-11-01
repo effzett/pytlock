@@ -1,0 +1,5 @@
+pytlock für Windows 10/11 (x64)
+
+Das Programm ist nicht signiert. SmartScreen zeigt beim ersten Start
+„Der Computer wurde durch Windows geschützt“ → „Weitere Informationen“ →
+„Trotzdem ausführen“. Start: pytlock\pytlock.exe

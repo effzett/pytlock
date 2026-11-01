@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pytlock"
+version = "0.1.0"
+description = "Zeitgesperrte Dateiverschlüsselung über drand/tlock mit RFC-3161-Einlieferungszeitstempel"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.12,<3.13"
+authors = [{ name = "Frank (effzett)" }]
+dependencies = [
+    "PySide6>=6.7",
+    "asn1crypto>=1.5.1",
+    "cryptography>=42",
+    "certifi>=2024.2.2",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-qt>=4.4", "pyinstaller>=6.10"]
+
+[project.scripts]
+pytlock = "pytlock.cli:main"
+
+[project.gui-scripts]
+pytlock-gui = "pytlock.gui.app:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+pytlock = ["data/tsa/*.pem", "data/tsa/*.crt", "data/tsa/*.txt"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "live: braucht Netz (drand, TSA) und ein echtes tle-Binary",
+]
+addopts = "-m 'not live'"
