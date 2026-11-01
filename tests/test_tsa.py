@@ -156,3 +156,16 @@ def test_network_error_is_retried_once():
 
     _, entry, _ = tsamod.request_timestamp(DIGEST, post=post, anchors=t.anchors, retry_delay=0)
     assert entry["name"] == "FreeTSA" and len(calls) == 2
+
+
+def test_load_anchors_skips_appledouble_and_garbage(tmp_path, monkeypatch):
+    """macOS legt auf exFAT-Datenträgern "._*.pem" an (beginnt mit 0x00).
+    Solche und andere unlesbare Dateien dürfen die Prüfung nicht abbrechen."""
+    d = tmp_path / "data" / "tsa"
+    d.mkdir(parents=True)
+    shutil.copy(FIX / "test-ca.pem", d / "ca.pem")
+    (d / "._ca.pem").write_bytes(b"\x00\x05\x16\x07" + b"\x00" * 60)
+    (d / "kaputt.crt").write_bytes(b"\x00kein Zertifikat")
+    monkeypatch.setattr(tsamod.resources, "files", lambda pkg: tmp_path)
+    certs = tsamod.load_anchors(include_certifi=False)
+    assert len(certs) == 1

@@ -127,12 +127,20 @@ def load_anchors(include_certifi: bool = True) -> list[x509.Certificate]:
     pkg = resources.files("pytlock") / "data" / "tsa"
     if pkg.is_dir():
         for entry in sorted(pkg.iterdir(), key=lambda p: p.name):
-            if entry.name.endswith((".pem", ".crt")):
-                data = entry.read_bytes()
+            # Versteckte Dateien überspringen, z. B. macOS-AppleDouble "._*.pem",
+            # die beim Entpacken auf exFAT/FAT-Datenträger entstehen.
+            if entry.name.startswith(".") or not entry.name.endswith((".pem", ".crt")):
+                continue
+            data = entry.read_bytes()
+            try:
+                certs.extend(x509.load_pem_x509_certificates(data))
+            except ValueError:
                 try:
-                    certs.extend(x509.load_pem_x509_certificates(data))
-                except ValueError:
                     certs.append(x509.load_der_x509_certificate(data))
+                except ValueError:
+                    # Eine unlesbare Datei darf die Prüfung nicht abbrechen;
+                    # ohne Anker meldet die Kettenprüfung das ohnehin.
+                    continue
     if include_certifi:
         with open(certifi.where(), "rb") as fh, warnings.catch_warnings():
             warnings.simplefilter("ignore")

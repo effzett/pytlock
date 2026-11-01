@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pytlock"
-version = "0.1.0"
+version = "0.1.2"
 description = "Zeitgesperrte Dateiverschlüsselung über drand/tlock mit RFC-3161-Einlieferungszeitstempel"
 readme = "README.md"
 license = { text = "MIT" }

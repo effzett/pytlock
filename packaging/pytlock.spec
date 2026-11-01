@@ -30,4 +30,4 @@ coll = COLLECT(exe, a.binaries, a.datas, name="pytlock", upx=False)
 if sys.platform == "darwin":
     app = BUNDLE(coll, name="pytlock.app", bundle_identifier="de.zenmeister.pytlock",
                  info_plist={"NSHighResolutionCapable": True,
-                             "CFBundleShortVersionString": "0.1.0"})
+                             "CFBundleShortVersionString": "0.1.2"})
