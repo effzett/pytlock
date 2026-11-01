@@ -343,7 +343,7 @@ class MainWindow(QMainWindow):
     def __init__(self, settings: Settings | None = None):
         super().__init__()
         settings = settings or Settings.load()
-        self.setWindowTitle(f"{S.APP_TITLE}  v{__version__}")
+        self.setWindowTitle(f"{S.APP_TITLE}  v{__version__}  ·  {S.APP_CONTACT}")
         tabs = QTabWidget()
         self.enc = EncryptTab(settings)
         self.dec = DecryptTab(settings)

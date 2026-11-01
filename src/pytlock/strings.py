@@ -1,6 +1,7 @@
 """Alle Oberflächentexte (Deutsch). Für eine Übersetzung diese Datei ersetzen."""
 
 APP_TITLE = "pytlock – Zeitschloss für Dateien"
+APP_CONTACT = "fz@zenmeister.de"
 TAB_ENCRYPT = "Verschlüsseln"
 TAB_DECRYPT = "Entschlüsseln"
 
