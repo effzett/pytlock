@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import sys
 import threading
+import traceback
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable
@@ -36,7 +37,10 @@ def describe_error(exc: BaseException) -> str:
         return S.MSG_TSA.format(detail=exc)
     if isinstance(exc, core.TargetInPast):
         return S.MSG_TARGET_PAST + "\n\n" + str(exc)
-    return S.MSG_ERROR.format(detail=exc)
+    # Unerwarteter Fehler: Typ und Aufrufstelle mit ausgeben, damit er sich
+    # ohne Konsole (PyInstaller, windowed) eingrenzen lässt.
+    tb = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__)[-12:])
+    return S.MSG_ERROR.format(detail=f"{type(exc).__name__}: {exc}") + "\n\n" + tb
 
 
 class Worker(QThread):
