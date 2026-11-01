@@ -99,10 +99,10 @@ def test_accepts_openssl_generated_token(tmp_path):
     cnf.write_text(f"""[tsa]
 default_tsa = t
 [t]
-serial = {tmp_path / 'serial'}
-signer_cert = {FIX / 'test-tsa.pem'}
-certs = {FIX / 'test-ca.pem'}
-signer_key = {FIX / 'test-tsa.key'}
+serial = {(tmp_path / 'serial').as_posix()}
+signer_cert = {(FIX / 'test-tsa.pem').as_posix()}
+certs = {(FIX / 'test-ca.pem').as_posix()}
+signer_key = {(FIX / 'test-tsa.key').as_posix()}
 signer_digest = sha256
 default_policy = 1.2.3.4.1
 other_policies = 1.2.3.4.2
